@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Модельный ряд</title>
+<script type="module">
+import('https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js')
+.catch(function(){ return import('https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js'); })
+.catch(function(){ return import('https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js'); });
+</script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; outline:none; }
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+.mr3dBlk, .mr3dBlk * { font-family:'Manrope','Helvetica Neue',Arial,sans-serif !important; }
+body { background:#ffffff; }
+.mr3dBlk { max-width:1400px; margin:0 auto 30px auto; padding:20px; }
+@media (max-width:768px){ .mr3dBlk { margin:14px 12px 24px 12px; padding:14px; border:1.5px solid #DAA520; border-radius:10px; } }
+.mr3dBlk .collapsible-content { position:relative; }
+.mr3dBlk .collapsible-content.expanded { overflow:visible; }
+.mr3dBlk .collapsible-content:not(.expanded) .sidebar { display:none; }
+.mr3dBlk .collapsible-content:not(.expanded) .content { min-width:0; }
+.mr3dBlk .collapsible-content:not(.expanded) .grid > .item:nth-child(n+5) { display:none; }
+.mr3dBlk .mr3dShowAllWrap { display:flex; justify-content:center; margin:28px 0 6px; }
+.mr3dBlk .collapsible-content.expanded .mr3dShowAllWrap { display:none; }
+.mr3dBlk .mr3dHideAllWrap { display:none; justify-content:center; margin:28px 0 6px; }
+.mr3dBlk .collapsible-content.expanded .mr3dHideAllWrap { display:flex; }
+.mr3dBlk .mr3dShowAll, .mr3dBlk .mr3dHideAll { padding:13px 32px; background:#fff; color:#1a1a1a; border:1.5px solid #DAA520; border-radius:8px; font-size:15px; font-weight:600; letter-spacing:.4px; cursor:pointer; transition:all .25s ease; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.mr3dBlk .mr3dShowAll:hover, .mr3dBlk .mr3dHideAll:hover { background:#DAA520; color:#fff; box-shadow:0 6px 16px rgba(218,165,32,.28); transform:translateY(-1px); }
+.mr3dBlk .mr3dShowAll span, .mr3dBlk .mr3dHideAll span { margin-left:8px; }
+@media (min-width:769px){
+.mr3dBlk .collapsible-content:not(.expanded) #mr3dCat1 .grid { grid-template-columns:repeat(4,minmax(140px,1fr)) !important; }
+.mr3dBlk .collapsible-content.expanded #mr3dCat1 .grid, .mr3dBlk .collapsible-content.expanded #mr3dCat3 .grid { grid-template-columns:repeat(3,minmax(180px,1fr)) !important; }
+}
+@media (max-width:768px){
+.mr3dBlk #mr3dCat1 .grid { display:flex !important; flex-wrap:wrap !important; flex-direction:row !important; justify-content:center !important; align-items:flex-start !important; gap:16px 4% !important; width:100% !important; padding:0 !important; margin:0 !important; }
+.mr3dBlk #mr3dCat1 .grid > .item { flex:0 0 47% !important; width:47% !important; max-width:47% !important; min-width:0 !important; margin:0 !important; }
+.mr3dBlk #mr3dCat1 .mr3d-thumb-wrap { width:100% !important; max-width:none !important; aspect-ratio:auto !important; padding-bottom:0 !important; height:33vw !important; min-height:120px !important; margin:0 0 8px !important; }
+.mr3dBlk #mr3dCat1 .item span { font-size:12px !important; }
+.mr3dBlk .collapsible-content:not(.expanded) #mr3dCat1 .grid > .item:nth-child(n+3) { display:none !important; }
+}
+.mr3dBlk .container { display:flex; flex-direction:column; gap:20px; align-items:stretch; margin-top:18px; }
+.mr3dBlk .sidebar { width:100%; align-self:stretch; position:relative; z-index:5; background:#ffffff; padding:6px 0 16px; }
+.mr3dBlk .categories { display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; gap:10px; }
+.mr3dBlk .mr3dCatBtn {
+display:block; padding:10px 22px; background-color:#fff !important; color:#000 !important;
+text-decoration:none !important; font-size:13px !important; font-weight:500 !important;
+border:1.5px solid #DAA520 !important; border-radius:8px !important; cursor:pointer; transition:all .3s ease;
+box-shadow:0 1px 3px rgba(0,0,0,.05); text-align:center;
+}
+.mr3dBlk .mr3dCatBtn:hover { transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.08); background-color:#fafafa !important; }
+.mr3dBlk .mr3dCatBtn.active { background-color:#fef8e7 !important; border-bottom:2px solid #DAA520 !important; }
+.mr3dBlk .content { flex:1; min-width:250px; }
+.mr3dBlk .mr3dCatBlk { display:none; animation:fadeIn .3s ease; }
+@keyframes fadeIn { from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);} }
+.mr3dBlk .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:28px; }
+.mr3dBlk .item { text-align:center; transition:all .3s ease; display:flex; flex-direction:column; align-items:center; cursor:pointer; position:relative; }
+.mr3dBlk .item img { width:100%; height:auto; border-radius:8px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); display:block; pointer-events:none; border:1.5px solid #DAA520; transition:all .3s ease; }
+.mr3dBlk .item:hover img { border-color:#DAA520; box-shadow:0 10px 28px rgba(0,0,0,.18); }
+.mr3dBlk .item span { font-size:13px; color:#000 !important; display:block; font-weight:500; line-height:1.4; pointer-events:none; transition:all .3s ease; }
+.mr3dBlk .item .mr3d-desc { font-size:12px; color:#8a8a8a !important; font-weight:400; margin-top:2px; line-height:1.3; }
+.mr3dBlk .item[data-model] .badge-3d {
+position:absolute; top:8px; right:8px; z-index:3; background:#DAA520; color:#fff; font-size:11px;
+font-weight:700; letter-spacing:.5px; padding:3px 8px; border-radius:6px;
+box-shadow:0 2px 6px rgba(0,0,0,.2); pointer-events:none;
+}
+.mr3dBlk .item:not([data-model]) .badge-3d { display:none; }
+.mr3dBlk #mr3dCat1 .item img, .mr3dBlk #mr3dCat3 .item img { max-width:400px; aspect-ratio:4/3; object-fit:cover; background:#e9e9e8; }
+.mr3dBlk .item .mr3d-thumb-wrap { position:relative; width:100%; max-width:400px; aspect-ratio:4/3; margin:0 auto 12px; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.06); border:1.5px solid #DAA520; background:#e9e9e8; transition:all .3s ease; }
+.mr3dBlk .item:hover .mr3d-thumb-wrap { border-color:#DAA520; box-shadow:0 10px 28px rgba(0,0,0,.18); }
+.mr3dBlk .item .mr3d-thumb-wrap model-viewer.mr3d-thumb { position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none; --poster-color:transparent; }
+.mr3dBlk #mr3dCat2 .item img { max-width:280px; aspect-ratio:340/480; object-fit:cover; }
+.mr3dBlk #mr3dCat2 .item .mr3d-thumb-wrap { max-width:280px; aspect-ratio:340/480; }
+@media (min-width:769px){ .mr3dBlk #mr3dCat2 .item { max-width:280px; margin-left:auto; margin-right:auto; } }
+@media (min-width:769px){
+.mr3dBlk .item.zoomed-item { transform:scale(1.3); margin:30px 0 40px 0; z-index:10000; position:relative; }
+.mr3dBlk .item.zoomed-item span { font-size:14px; font-weight:600; }
+}
+@media (max-width:768px){
+.mr3dBlk .container { flex-direction:column; gap:20px; align-items:stretch; }
+.mr3dBlk .content { width:100%; min-width:0; }
+.mr3dBlk .sidebar { flex:auto; width:100%; position:sticky; top:70px; background:rgba(255,255,255,.95); backdrop-filter:blur(10px); padding:12px 0; z-index:98; }
+.mr3dBlk .categories { flex-direction:row; flex-wrap:wrap; justify-content:center; gap:10px; }
+.mr3dBlk .mr3dCatBtn { flex:0 0 auto; padding:12px 20px; white-space:nowrap; }
+.mr3dBlk .mr3dCatBtn.active { border-left:none !important; border-bottom:2px solid #DAA520 !important; }
+.mr3dBlk #mr3dCat3 .grid { display:flex !important; flex-wrap:wrap !important; flex-direction:row !important; justify-content:center !important; align-items:flex-start !important; gap:16px 4% !important; width:100% !important; }
+.mr3dBlk #mr3dCat3 .grid > .item { flex:0 0 47% !important; width:47% !important; max-width:47% !important; min-width:0 !important; margin:0 !important; }
+.mr3dBlk #mr3dCat3 .item img { width:100% !important; max-width:none !important; height:33vw !important; min-height:120px !important; aspect-ratio:auto !important; object-fit:cover !important; margin-bottom:8px !important; }
+.mr3dBlk #mr3dCat3 .mr3d-thumb-wrap { width:100% !important; max-width:none !important; height:33vw !important; min-height:120px !important; aspect-ratio:auto !important; margin:0 auto 8px !important; }
+.mr3dBlk #mr3dCat3 .item span { font-size:12px !important; }
+.mr3dBlk .item span { font-size:11px; }
+.mr3dBlk #mr3dCat2 .grid { display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:stretch !important; gap:12px !important; width:100% !important; }
+.mr3dBlk #mr3dCat2 .item { flex:1 1 0 !important; min-width:0 !important; width:auto !important; display:flex !important; flex-direction:column; align-items:center; justify-content:flex-start; }
+.mr3dBlk #mr3dCat2 .item img { width:100% !important; max-width:none !important; height:auto !important; aspect-ratio:340/480 !important; object-fit:cover !important; margin-bottom:8px !important; border-radius:8px; }
+.mr3dBlk #mr3dCat2 .mr3d-thumb-wrap { width:100% !important; max-width:none !important; height:42vw !important; min-height:150px !important; aspect-ratio:auto !important; margin:0 auto 8px !important; }
+.mr3dBlk #mr3dCat2 .item span { text-align:center; width:100%; font-size:10px; word-break:keep-all; white-space:normal; line-height:1.3; }
+.mr3dBlk #mr3dCat2 .item span.badge-3d { width:auto !important; left:auto !important; text-align:center; }
+.mr3dBlk .item.tapped { transform:scale(.97); opacity:.85; transition:all .1s ease; }
+}
+@media (max-width:480px){
+.mr3dBlk #mr3dCat2 .grid { gap:8px !important; }
+.mr3dBlk #mr3dCat2 .item span { font-size:9px; }
+}
+@media (max-width:360px){ .mr3dBlk #mr3dCat2 .grid { gap:6px !important; } .mr3dBlk #mr3dCat2 .item span { font-size:8px; } }
+@media (min-width:481px) and (max-width:768px){ .mr3dBlk #mr3dCat2 .grid { gap:15px !important; } .mr3dBlk #mr3dCat2 .item span { font-size:10px; } }
+@media (max-width:768px){ .mr3dBlk #mr3dCat2 { width:100%; overflow:visible; } .mr3dBlk #mr3dCat2 .grid { padding:0 !important; margin:0 !important; } }
+.mv-modal { position:fixed; inset:0; z-index:999999; display:none; align-items:center; justify-content:center; padding:20px; font-family:'Manrope',Arial,sans-serif; }
+.mv-modal.open { display:flex; }
+.mv-modal__overlay { position:absolute; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(4px); animation:mvFade .25s ease; }
+@keyframes mvFade { from{opacity:0;} to{opacity:1;} }
+.mv-modal__window { position:relative; width:100%; max-width:1200px; background:#ffffff; border:1.5px solid #DAA520; border-radius:12px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.5); animation:mvPop .28s cubic-bezier(.2,.9,.4,1.1); }
+@keyframes mvPop { from{opacity:0; transform:scale(.94);} to{opacity:1; transform:scale(1);} }
+.mv-modal__header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; background:#ffffff; }
+.mv-modal__title { display:inline-block; color:#fff; font-size:15px; font-weight:600; letter-spacing:.5px; padding:8px 14px; background:#1a1a1a; border-radius:8px; border-left:3px solid #DAA520; }
+.mv-modal__body { display:flex; align-items:stretch; height:min(82vh,760px); background:#fff; }
+.mv-modal__viewer { position:relative; flex:1; min-width:0; height:100%; background:#ffffff; }
+.mv-modal__viewer model-viewer { width:100%; height:100%; background-color:#ffffff; --poster-color:#ffffff; }
+.mv-modal__viewer model-viewer::part(default-progress-bar) { display:none; }
+.mv-modal__close { flex:0 0 auto; width:36px; height:36px; border:none; border-radius:8px; background:#f0efe9; color:#333; font-size:22px; line-height:1; cursor:pointer; transition:all .2s ease; }
+.mv-modal__close:hover { background:#DAA520; color:#fff; }
+.mv-hint { position:absolute; bottom:14px; left:50%; transform:translateX(-50%); width:46px; height:46px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.9); border-radius:50%; box-shadow:0 2px 10px rgba(0,0,0,.12); pointer-events:none; animation:mvPulse 2.4s ease-in-out infinite; }
+.mv-hint svg { width:26px; height:26px; }
+@keyframes mvPulse { 0%,100%{ transform:translateX(-50%) scale(1); opacity:.8; } 50%{ transform:translateX(-50%) scale(1.12); opacity:1; } }
+.mv-palette { flex:0 0 auto; width:248px; display:flex; flex-direction:column; gap:4px; padding:12px 8px; background:#fff; border-right:1px solid #f0efe9; overflow-y:auto; }
+.mv-swatch-row { display:flex; align-items:center; gap:9px; cursor:pointer; padding:5px 6px; border-radius:8px; transition:background .15s ease; }
+.mv-swatch-row:hover { background:#f6f5f0; }
+.mv-swatch-row.active { background:#fdf6e3; }
+.mv-swatch { width:24px; height:24px; flex:0 0 auto; border-radius:50%; background-size:cover; background-position:center; border:2px solid #fff; box-shadow:0 0 0 1px rgba(0,0,0,.18); transition:box-shadow .15s ease; }
+.mv-swatch-row.active .mv-swatch { box-shadow:0 0 0 2px #DAA520; }
+.mv-swatch-name { font-size:12px; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mv-pal-title { font-size:12px; font-weight:700; color:#222; text-align:left; padding:2px 6px 10px; letter-spacing:.4px; text-transform:uppercase; position:sticky; top:0; background:#fff; z-index:5; }
+.mv-acc-item { border-bottom:1px solid #f3f1ea; }
+.mv-acc-head { display:flex; align-items:center; justify-content:space-between; gap:8px; cursor:pointer; padding:10px 6px; font-size:12.5px; font-weight:600; color:#222; border-radius:8px; transition:background .15s ease; }
+.mv-acc-head:hover { background:#f6f5f0; }
+.mv-acc-chevron svg { width:13px; height:13px; transform:rotate(-90deg); transition:transform .2s ease; flex:0 0 auto; }
+.mv-acc-item.open > .mv-acc-head .mv-acc-chevron svg { transform:rotate(0deg); }
+.mv-acc-item.open > .mv-acc-head { position:sticky; top:28px; z-index:4; background:#fff; }
+.mv-acc-body { display:none; flex-direction:column; gap:4px; padding:2px 0 10px; }
+.mv-acc-item.open > .mv-acc-body { display:flex; }
+.mv-sub-head { display:flex; align-items:center; justify-content:space-between; gap:8px; cursor:pointer; padding:8px 6px 8px 14px; font-size:12px; font-weight:500; color:#444; border-radius:6px; transition:background .15s ease; }
+.mv-sub-head:hover { background:#f6f5f0; }
+.mv-sub-item.open > .mv-sub-head .mv-acc-chevron svg { transform:rotate(0deg); }
+.mv-sub-item.open > .mv-sub-head { color:#000; font-weight:600; position:sticky; top:64px; z-index:3; background:#fff; }
+.mv-sub-body { display:none; flex-direction:column; gap:4px; padding:2px 4px 8px 8px; max-height:165px; overflow-y:auto; }
+.mv-sub-item.open > .mv-sub-body { display:flex; }
+.mv-foot { background:#fff; padding:0 6px 8px; }
+.mv-summary { margin-top:6px; padding:8px 0 4px; border-top:1px solid #eee; }
+.mv-summary-title { font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:#9a9a9a; margin-bottom:5px; }
+.mv-summary-row { display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:11px; line-height:1.45; }
+.mv-summary-lbl { color:#8a8a8a; flex:0 0 auto; }
+.mv-summary-val { color:#1a1a1a; font-weight:600; text-align:right; }
+.mv-dims { padding-top:8px; }
+.mv-dims-lbl { font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:#9a9a9a; margin-bottom:4px; }
+.mv-dims-row { display:flex; gap:6px; }
+.mv-num { flex:1 1 0; min-width:0; box-sizing:border-box; padding:7px 6px; font-size:12px; border:1px solid #ddd; border-radius:6px; font-family:inherit; }
+.mv-num::-webkit-outer-spin-button, .mv-num::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+.mv-contact { display:block; box-sizing:border-box; width:100%; margin-top:8px; padding:9px 8px; font-size:12px; border:1px solid #ddd; border-radius:6px; font-family:inherit; }
+.mv-num:focus, .mv-contact:focus { outline:none; border-color:#DAA520; }
+.mv-btns { display:flex; gap:8px; margin-top:9px; }
+.mv-btns2 { display:flex; gap:8px; margin-top:8px; }
+.mv-where { flex:1 1 auto; display:inline-flex; align-items:center; justify-content:center; padding:9px 12px; font-size:12px; font-weight:600; color:#1a1a1a; background:#fff; border:1px solid #1a1a1a; border-radius:8px; cursor:pointer; text-decoration:none; font-family:inherit; transition:all .15s ease; }
+.mv-where:hover { background:#1a1a1a; color:#fff; }
+.mv-reset { flex:0 0 auto; padding:9px 12px; font-size:12px; font-weight:600; color:#555; background:#f0efe9; border:none; border-radius:8px; cursor:pointer; font-family:inherit; }
+.mv-reset:hover { background:#e3e0d6; }
+.mv-price { flex:1 1 auto; padding:10px 12px; font-size:13px; font-weight:700; color:#fff; background:#1a1a1a; border:none; border-radius:8px; cursor:pointer; font-family:inherit; transition:background .15s ease; }
+.mv-price:hover { background:#DAA520; }
+.mv-status { min-height:14px; margin-top:7px; font-size:11px; text-align:center; }
+.mv-note { margin-top:8px; font-size:9.5px; line-height:1.4; color:#a2a2a2; text-align:left; }
+.mv-legs-row { display:flex; align-items:center; padding:10px 6px; border-bottom:1px solid #f3f1ea; }
+.mv-legs-label { display:flex; align-items:center; gap:9px; cursor:pointer; font-size:12.5px; font-weight:600; color:#222; user-select:none; }
+.mv-legs-chk { width:17px; height:17px; accent-color:#DAA520; cursor:pointer; flex:0 0 auto; }
+@media (max-width:768px){
+.mv-modal { padding:10px; align-items:flex-start; }
+.mv-modal__window { max-height:94vh; max-height:94dvh; display:flex; flex-direction:column; }
+.mv-modal__header { flex:0 0 auto; }
+.mv-modal__body { flex:1 1 auto; min-height:0; flex-direction:column; height:auto; max-height:none; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.mv-modal__viewer { order:1; flex:0 0 auto; height:42vh; height:42dvh; width:100%; }
+.mv-palette { order:2; width:100%; flex:0 0 auto; overflow:visible; padding:6px 12px 14px; border-right:none; border-top:1px solid #f0efe9; }
+.mv-acc-head { padding:9px 6px; }
+.mv-sub-head { padding:7px 6px 7px 14px; }
+.mv-foot { position:static; box-shadow:none; }
+}
+/* === ФИКС: Пеналы на десктопе — одинаковые крупные превью === */
+@media (min-width:769px){
+.mr3dBlk #mr3dCat2 .grid { display:grid !important; grid-template-columns:repeat(3,minmax(0,300px)) !important; justify-content:center !important; gap:32px !important; }
+.mr3dBlk #mr3dCat2 .item { max-width:none !important; margin:0 !important; }
+.mr3dBlk #mr3dCat2 .item .mr3d-thumb-wrap, .mr3dBlk #mr3dCat2 .item img { max-width:none !important; width:100% !important; aspect-ratio:340/480 !important; }
+}
+/* === Вводный текст в золотистой рамке === */
+.mr3dBlk .mr3dIntro{ max-width:none; margin:0 auto 20px; padding:16px 20px; background:transparent; color:#1a1a1a; font-size:13.5px; line-height:1.5; display:flex; align-items:stretch; text-align:center; }
+.mr3dBlk .mr3dIntro p{ flex:1; margin:0; padding:0 24px; display:flex; flex-direction:column; justify-content:flex-start; }
+.mr3dBlk .mr3dIntro .mr3dIntroH{ display:block; margin-bottom:7px; font-size:14.5px; color:#1a1a1a; font-weight:700; }
+.mr3dBlk .mr3dIntro p + p{ border-left:1px solid #e7cf86; }
+.mr3dBlk .mr3dIntro strong{ color:#876312; font-weight:700; }
+@media (max-width:768px){ .mr3dBlk .mr3dIntro{ flex-direction:column; padding:12px 16px; margin-bottom:12px; font-size:12.5px; line-height:1.4; } .mr3dBlk .mr3dIntro p{ padding:9px 0 0; } .mr3dBlk .mr3dIntro p + p{ border-left:none; border-top:1px solid #e7cf86; } .mr3dBlk .mr3dIntro p:first-child{ padding-top:0; } }
+</style>
+</head>
+<body>
+<div class="mr3dBlk" id="mr3dBlkAV">
+<div class="mr3dIntro">
+<p><strong class="mr3dIntroH">Модели</strong><span>Вы выбираете стиль коллекции, а мы создаём премиум-мебель с размерами под вашу ванную. Общие габариты — высоту, ширину, глубину — и ширину ящиков делаем такими, как нужно именно вам.</span></p>
+<p><strong class="mr3dIntroH">Столешницы и раковины</strong><span>Керамогранит, кварц или Solid Surface, с накладной либо интегрированной раковиной — всё из наших коллекций. Подбираем под ваш проект в нужной эстетике. Столешница и раковина могут быть из любой коллекции, независимо от мебели, если это технически осуществимо.</span></p>
+<p><strong class="mr3dIntroH">Зеркала</strong><span>Зеркало из наших коллекций подбирается под выбранный стиль или под ваш существующий интерьер. Его коллекция также может отличаться от остальных элементов — главное, чтобы результат был гармоничным.</span></p>
+</div>
+<div class="collapsible-content">
+<div class="container">
+<div class="sidebar">
+<div class="categories">
+<a href="#mr3dCat1" class="mr3dCatBtn">Тумбы</a>
+<a href="#mr3dCat2" class="mr3dCatBtn">Пеналы</a>
+<a href="#mr3dCat3" class="mr3dCatBtn">Зеркала</a>
+</div>
+</div>
+<div class="content">
+<div id="mr3dCat1" class="mr3dCatBlk">
+<div class="grid">
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV01.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV01.glb?v=av6" alt="AV01" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Тумба AV01</span></div>
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV02.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV02.glb?v=av6" alt="AV02" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Тумба AV02</span></div>
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV03.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV03.glb?v=av6" alt="AV03" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Тумба AV03</span></div>
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV04.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV04.glb?v=av6" alt="AV04" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Тумба AV04</span></div>
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV05.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV05.glb?v=av6" alt="AV05" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Тумба AV05</span></div>
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV06.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV06.glb?v=av6" alt="AV06" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Тумба AV06</span></div>
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV07.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV07.glb?v=av6" alt="AV07" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Тумба AV07</span></div>
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV08.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV08.glb?v=av6" alt="AV08" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Тумба AV08</span></div>
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV09.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV09.glb?v=av6" alt="AV09" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Тумба AV09</span></div>
+</div>
+</div>
+<div id="mr3dCat2" class="mr3dCatBlk">
+<div class="grid">
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV10.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV10.glb?v=av6" alt="AV10" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Пенал AV10</span></div>
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV11.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV11.glb?v=av6" alt="AV11" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Пенал AV11</span></div>
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV12.glb?v=av6"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV12.glb?v=av6" alt="AV12" camera-orbit="-22deg 74deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.1" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Пенал AV12</span></div>
+</div>
+</div>
+<div id="mr3dCat3" class="mr3dCatBlk">
+<div class="grid">
+<div class="item" data-model="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV-M.glb?v=3"><div class="mr3d-thumb-wrap"><model-viewer class="mr3d-thumb" src="https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/AV-M.glb?v=3" alt="Зеркало AV" camera-orbit="-14deg 80deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.05" loading="lazy" reveal="auto" tabindex="-1"></model-viewer><span class="badge-3d">3D</span></div><span>Зеркало AV</span></div>
+</div>
+</div>
+</div>
+</div>
+<div class="mr3dShowAllWrap"><button type="button" class="mr3dShowAll">Смотреть весь модельный ряд <span aria-hidden="true">&#8594;</span></button></div>
+<div class="mr3dHideAllWrap"><button type="button" class="mr3dHideAll">Скрыть модельный ряд <span aria-hidden="true">&#8593;</span></button></div>
+</div>
+</div>
+<div class="mv-modal" id="mvModal" aria-hidden="true">
+<div class="mv-modal__overlay" data-close="1"></div>
+<div class="mv-modal__window">
+<div class="mv-modal__header">
+<span class="mv-modal__title"></span>
+<button class="mv-modal__close" data-close="1" aria-label="Закрыть">&times;</button>
+</div>
+<div class="mv-modal__body">
+<div class="mv-palette" id="mvSwatches"></div>
+<div class="mv-modal__viewer">
+<model-viewer id="mvViewer"
+camera-controls
+touch-action="none"
+interaction-prompt="none"
+disable-tap
+min-camera-orbit="-90deg auto auto"
+max-camera-orbit="90deg auto auto"
+shadow-intensity="1"
+environment-image="neutral"
+exposure="1.1"
+alt="3D-модель">
+</model-viewer>
+<div class="mv-hint" aria-hidden="true">
+<svg viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M9 11V5.6a1.4 1.4 0 0 1 2.8 0V10"/>
+<path d="M11.8 10V4.6a1.4 1.4 0 0 1 2.8 0V10.4"/>
+<path d="M14.6 10.4V6.4a1.4 1.4 0 0 1 2.8 0v6.2"/>
+<path d="M9 11V9a1.4 1.4 0 0 0-2.8 0v4.2a6.5 6.5 0 0 0 6.5 6.5h.7a6.4 6.4 0 0 0 6-6.4"/>
+</svg>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+function openModelViewer(url, title){
+var modal = document.getElementById('mvModal');
+var mv = document.getElementById('mvViewer');
+modal.querySelector('.mv-modal__title').textContent = title || '';
+mv.setAttribute('src', url);
+try{ mv.cameraOrbit='-22deg 74deg auto'; mv.fieldOfView='auto'; }catch(e){}
+modal.classList.add('open');
+modal.setAttribute('aria-hidden','false');
+document.body.style.overflow = 'hidden';
+}
+function closeModelViewer(){
+var modal = document.getElementById('mvModal');
+var mv = document.getElementById('mvViewer');
+modal.classList.remove('open');
+modal.setAttribute('aria-hidden','true');
+mv.removeAttribute('src'); // выгружаем модель
+if(window.__mvReset) window.__mvReset(); // сброс выбранных материалов и меню
+document.body.style.overflow = '';
+}
+(function(){
+var modal = document.getElementById('mvModal');
+if(modal){
+modal.addEventListener('click', function(e){ if(e.target.getAttribute('data-close')) closeModelViewer(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModelViewer(); });
+}
+})();
+(function(){
+var BASE = 'https://static.tildacdn.com/';
+var SWATCHES = [
+{name:'G/M (01) Arctic Fog', u:'tild3934-6663-4132-b332-643462653637/GM_01.jpg', hex:'#e6eaec'},
+{name:'G/M (02) White Brilliant', u:'tild3765-6338-4238-b962-353166343338/GM_02.png', hex:'#f3f1ec'},
+{name:'G/M (03) Crystal Ray', u:'tild3831-3436-4439-b032-333037333834/GM_03.png', hex:'#e9e6df'},
+{name:'G/M (04) Soft Opal', u:'tild6162-3438-4233-a635-396261633930/GM_04.png', hex:'#e3ddd2'},
+{name:'G/M (05) Warm Nude', u:'tild3138-3435-4232-a463-613562616434/GM_05.png', hex:'#ddc9b4'},
+{name:'G/M (06) Bare Earth', u:'tild3534-3632-4761-b163-663438663433/GM_06.png', hex:'#c9b49c'},
+{name:'G/M (07) Frosty Grey', u:'tild6162-3764-4235-b535-346166626633/GM_07.png', hex:'#cfd0cd'},
+{name:'G/M (08) Cashmere Touch', u:'tild3665-6334-4832-a666-323537303938/GM_08.png', hex:'#d8cdbb'},
+{name:'G/M (09) Burn Honey', u:'tild3834-3930-4633-a134-663563653735/GM_09.png', hex:'#c79a5e'},
+{name:'G/M (10) Smoked Caramel', u:'tild3537-3632-4630-b137-336139613632/GM_10.png', hex:'#a9794e'},
+{name:'G/M (11) Magic Stone', u:'tild3336-3733-4731-b834-373266343661/GM_11.png', hex:'#b9b4ab'},
+{name:'G/M (12) Nature Heart', u:'tild3263-6434-4630-a231-643364613866/GM_12.png', hex:'#9a8f74'},
+{name:'G/M (13) Smoky Ice', u:'tild6639-3230-4833-b837-623061666562/GM_13.png', hex:'#d3d6d6'},
+{name:'G/M (14) Beige Calm', u:'tild6332-3234-4133-b361-393530373065/GM_14.png', hex:'#d9cdb8'},
+{name:'G/M (15) Beach Sand', u:'tild3431-3833-4466-b961-326664616166/GM_15.png', hex:'#d8c6a4'},
+{name:'G/M (16) Canyon Glow', u:'tild3761-3062-4665-b564-643534636365/GM_16.png', hex:'#c08a5e'},
+{name:'G/M (17) Brown Comfort', u:'tild6134-3364-4465-b666-376464346562/GM_17.png', hex:'#8c6b50'},
+{name:'G/M (18) Cognac', u:'tild3763-3962-4139-a463-386463613133/GM_18.png', hex:'#8a5a34'},
+{name:'G/M (19) Perfect Olive', u:'tild3132-3366-4832-a333-653165643263/GM_19.png', hex:'#7d7c54'},
+{name:'G/M (20) Summer Forest', u:'tild3634-3365-4538-b937-383839626637/GM_20.png', hex:'#5f6b4b'},
+{name:'G/M (21) Ghost Grey', u:'tild3566-3333-4464-b361-616233346261/GM_21.png', hex:'#c4c6c4'},
+{name:'G/M (22) Grey Sharm', u:'tild3530-3837-4564-a566-366632313331/GM_22.png', hex:'#9b9b98'},
+{name:'G/M (23) Soft Mineral', u:'tild3031-3231-4039-b461-376566646164/GM_23.png', hex:'#b7b8b2'},
+{name:'G/M (24) Sea Shell', u:'tild3938-3663-4939-a433-613939616634/GM_24.png', hex:'#e7ddd0'},
+{name:'G/M (25) Oat Skin', u:'tild6465-3066-4261-b736-616539643765/GM_25.png', hex:'#d6c7ad'},
+{name:'G/M (26) Cloud Steel', u:'tild6330-3965-4363-b338-656465643731/GM_26.png', hex:'#aeb3b5'},
+{name:'G/M (27) Earth Stone', u:'tild3065-6331-4162-a330-323331333838/GM_27.png', hex:'#8f7d68'},
+{name:'G/M (28) Black Diamond', u:'tild3730-6338-4066-b463-346564303039/GM_28.png', hex:'#2b2b2d'}
+];
+var BODY = SWATCHES; // корпус — эмаль из массива выше (матовая и глянцевая)
+var MATTE = 0.75, GLOSS = 0.12; // шероховатость: матовый / глянцевый
+var TEXBASE = 'https://raw.githubusercontent.com/yakovetsdmitrij-cmd/BL01/main/';
+var TEXVER = '?v=av1'; // версия текстур (кварц) для сброса кэша
+
+// ===== КВАРЦ 20 ММ (новый набор) =====
+// ВНИМАНИЕ: укажите здесь НОВЫЙ кварц 20 мм. Для каждого варианта:
+//   1) загрузите файл текстуры в репозиторий (рядом с GLB-моделями);
+//   2) впишите строку { name:'Название', tex:'ИмяФайла.расширение' }.
+// Имя файла с пробелами кодируйте как %20 (пример: 'Bianco%20Carrara.webp').
+// Старый набор (Corazon/Beton/Materica/Nube/Rusty) НЕ используется — удалите примеры ниже.
+var QUARTZ = [
+{name:'4011', tex:'4011.jpg'},
+{name:'4023', tex:'4023.jpg'},
+{name:'4033', tex:'4033.jpg'},
+{name:'4043', tex:'4043.jpg'},
+{name:'4044', tex:'4044.jpg'},
+{name:'5000', tex:'5000.jpg'},
+{name:'5003', tex:'5003.jpg'},
+{name:'5031', tex:'5031.jpg'},
+{name:'5100', tex:'5100.jpg'},
+{name:'5110', tex:'5110.jpg'},
+{name:'5131', tex:'5131.jpg'},
+{name:'5133', tex:'5133.jpg'},
+{name:'5143', tex:'5143.jpg'},
+{name:'5212', tex:'5212.jpg'},
+{name:'6003', tex:'6003.jpg'},
+{name:'6046', tex:'6046.jpg'},
+{name:'6131', tex:'6131.jpg'},
+{name:'6134', tex:'6134.jpg'},
+{name:'6313', tex:'6313.jpg'},
+{name:'6338', tex:'6338.jpg'}
+];
+
+// ===== МОЛДИНГ + РУЧКИ + НАКОНЕЧНИКИ НОЖЕК (золото / серебро) =====
+var TRIM = [
+{name:'Золото', hex:'#c9a44c', rough:0.06},
+{name:'Серебро', hex:'#d6d8db', rough:0.04}
+];
+// дефолты зеркал (вид запечён в модель; здесь — для сводки и меню)
+var MIRROR_DEF = {
+'BL-M':{ body:'#e7ddd0', bodyName:'G/M (24) Sea Shell' },
+'EL-M':{ veneer:true, bodyName:'Шпон 4 (SH4)' },
+'AV-M':{ body:'#e7ddd0', bodyName:'G/M (24) Sea Shell', trim:'Золото' },
+'AT-M':{ frameName:'Чёрный металл' }
+};
+function mirrorKey(){ var m=((viewer&&viewer.src)||'').match(/([A-Za-z]+)-M\.glb/); return m?m[1].toUpperCase()+'-M':null; }
+var viewer = document.getElementById('mvViewer');
+var pal = document.getElementById('mvSwatches');
+var cur = { body:null, top:null, trim:null };
+if(viewer){
+viewer.addEventListener('contextmenu', function(e){ e.preventDefault(); }, true);
+viewer.addEventListener('dragstart', function(e){ e.preventDefault(); }, true);
+}
+function mats(){ return (viewer && viewer.model) ? viewer.model.materials : []; }
+// Корпус = всё, кроме молдинга (gold/LegGold), столешницы (cer) и спец-материалов.
+// Материал "Leg" (стойки ножек) специально ПОПАДАЕТ в корпус — стойки повторяют цвет корпуса.
+function bodyMats(){ return mats().filter(function(m){ return !/gold|cer|antr|marble|мрамор|mirror|зеркал|a{5,}|glass|стекл|black metal/i.test(m.name||''); }); }
+var MODAL_MIRROR_RE=/mirror|зеркал|a{5,}/i;
+function isMirror(){ return mats().some(function(m){ return MODAL_MIRROR_RE.test(m.name||''); }); }
+// Молдинг = gold (молдинг+ручки) + LegGold (наконечники ножек) — единый золото/серебро.
+function trimMats(){ return mats().filter(function(m){ return /^(gold|leggold)$/i.test(m.name||''); }); }
+// Все материалы ножек (стойки Leg + наконечники LegGold) — для показа/скрытия.
+function legMats(){ return mats().filter(function(m){ return /^(leg|leggold)$/i.test(m.name||''); }); }
+function named(n){ return mats().filter(function(m){ return (m.name||'').toLowerCase()===n; }); }
+function darkenHex(hex, f){
+try{
+var h=(''+hex).replace('#',''); if(h.length===3) h=h.replace(/(.)/g,'$1$1');
+var n=parseInt(h,16); var r=(n>>16)&255, gg=(n>>8)&255, b=n&255;
+r=Math.round(r*f); gg=Math.round(gg*f); b=Math.round(b*f);
+return '#'+((1<<24)+(r<<16)+(gg<<8)+b).toString(16).slice(1);
+}catch(e){ return hex; }
+}
+var GAP_RE=/gap|зазор|\.0\d+$/i; // материал зазоров/торцов (отдельный от корпуса)
+function applyBody(hex, rough){
+cur.body = { hex:hex, rough:rough };
+bodyMats().forEach(function(m){
+var p=m.pbrMetallicRoughness; if(!p) return;
+try{ if(p.baseColorTexture) p.baseColorTexture.setTexture(null); }catch(e){} // эмаль — чистый цвет без текстуры
+var col = GAP_RE.test(m.name||'') ? darkenHex(hex, 0.58) : hex; // зазор — тот же цвет корпуса, лишь слегка затемнён (мягкая тень, материал виден)
+try{ p.setBaseColorFactor(col); }catch(e){}
+try{ p.setMetallicFactor(0); }catch(e){}
+if(rough!=null){ try{ p.setRoughnessFactor(rough); }catch(e){} }
+});
+}
+function applyTop(sw){
+cur.top = sw;
+named('cer').forEach(function(m){
+var p = m.pbrMetallicRoughness; if(!p) return;
+if(sw.tex){
+viewer.createTexture(TEXBASE + sw.tex + TEXVER).then(function(t){
+try{ p.baseColorTexture.setTexture(t); }catch(e){}
+try{ p.baseColorTexture.texture.sampler.setRotation(0); }catch(e){} // кварц — горизонтально
+try{ p.setBaseColorFactor('#ffffff'); }catch(e){}
+}).catch(function(){});
+} else if(sw.hex){
+try{ p.setBaseColorFactor(sw.hex); }catch(e){}
+}
+});
+}
+var GOLD_ROUGH = 0.06;
+function applyTrim(opt){
+cur.trim=opt;
+trimMats().forEach(function(m){ // молдинг + ручки + наконечники ножек
+var p=m.pbrMetallicRoughness; if(!p) return;
+try{ if(p.baseColorTexture) p.baseColorTexture.setTexture(null); }catch(e){} // снимаем золотую текстуру -> чистый металл
+try{ p.setBaseColorFactor(opt.hex); }catch(e){}
+try{ p.setMetallicFactor(1); }catch(e){}
+try{ p.setRoughnessFactor(opt.rough!=null?opt.rough:GOLD_ROUGH); }catch(e){}
+});
+}
+// ===== ШПОН (для зеркала EL-M): SH1–SH5, по умолчанию SH4 =====
+var VENEER = [
+{ name:'Шпон 1', tex:'SH1.jpg' },
+{ name:'Шпон 2', tex:'SH2.jpg' },
+{ name:'Шпон 3', tex:'SH3.jpg' },
+{ name:'Шпон 4', tex:'SH4.jpg' },
+{ name:'Шпон 5', tex:'SH5.png' }
+];
+function applyVeneer(sw){
+cur.veneer = sw; cur.body = null;
+bodyMats().forEach(function(m){                 // рама EL-M = G/M8
+var p = m.pbrMetallicRoughness; if(!p) return;
+viewer.createTexture(TEXBASE + sw.tex + TEXVER).then(function(t){
+try{ if(p.baseColorTexture){ p.baseColorTexture.setTexture(t); } }catch(e){}
+try{ p.setBaseColorFactor('#ffffff'); }catch(e){}
+try{ p.setMetallicFactor(0); }catch(e){}
+try{ p.setRoughnessFactor(0.5); }catch(e){}
+}).catch(function(){});
+});
+}
+var LEGS_ON = true;
+function mvScene(){
+try{ var sy=Object.getOwnPropertySymbols(viewer);
+for(var i=0;i<sy.length;i++){ if(sy[i].description==='scene') return viewer[sy[i]]; }
+for(var j=0;j<sy.length;j++){ var v=viewer[sy[j]]; if(v && typeof v.updateShadow==='function') return v; }
+}catch(e){} return null; }
+function legMeshes(){
+var sc=mvScene(), out=[]; if(!sc) return out;
+try{ sc.traverse(function(o){ if(o.isMesh){
+var ms=Array.isArray(o.material)?o.material:[o.material];
+for(var i=0;i<ms.length;i++){ if(ms[i] && /^(leg|leggold)$/i.test(ms[i].name||'')){ out.push(o); break; } }
+} }); }catch(e){} return out; }
+function applyLegVisibility(){
+var sc=mvScene(); if(!sc) return;
+legMeshes().forEach(function(o){ o.visible=LEGS_ON; if('castShadow' in o) o.castShadow=LEGS_ON; });
+try{ if(sc.updateShadow) sc.updateShadow(); }catch(e){}
+try{ if(sc.queueRender) sc.queueRender(); }catch(e){}
+}
+function setLegsOn(on){ LEGS_ON=on; applyLegVisibility(); }
+var sampled = {};
+function sample(sw){
+if(!sw.u) return;
+var img = new Image(); img.crossOrigin='anonymous';
+img.onload = function(){
+try{
+var c=document.createElement('canvas'); c.width=8; c.height=8;
+var x=c.getContext('2d'); x.drawImage(img,0,0,8,8);
+var d=x.getImageData(0,0,8,8).data, r=0,g=0,b=0,n=0;
+for(var i=0;i<d.length;i+=4){ r+=d[i]; g+=d[i+1]; b+=d[i+2]; n++; }
+function h(v){ return ('0'+Math.round(v/n).toString(16)).slice(-2); }
+sampled[sw.name] = '#'+h(r)+h(g)+h(b);
+}catch(e){}
+};
+img.src = BASE + sw.u;
+}
+function buildSwatchRow(sw, onPick, withImg, dispFn){
+if(withImg) sample(sw);
+var label = dispFn ? dispFn(sw.name) : sw.name;
+var row = document.createElement('div'); row.className='mv-swatch-row'; row.title=label;
+var dot = document.createElement('span'); dot.className='mv-swatch'; dot.style.backgroundColor = sw.hex||'#ccc';
+if(sw.tex){ dot.style.backgroundImage = 'url("'+TEXBASE+sw.tex+TEXVER+'")'; }
+else if(withImg && sw.u){ dot.style.backgroundImage = 'url("'+BASE+sw.u+'")'; }
+var nm = document.createElement('span'); nm.className='mv-swatch-name'; nm.textContent=label;
+row.appendChild(dot); row.appendChild(nm);
+row.addEventListener('click', function(){
+row.parentElement.querySelectorAll('.mv-swatch-row').forEach(function(s){ s.classList.remove('active'); });
+row.classList.add('active');
+onPick(sw);
+});
+return row;
+}
+var CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+function buildNode(node, level){
+var item = document.createElement('div'); item.className = (level===0 ? 'mv-acc-item' : 'mv-sub-item');
+var head = document.createElement('div'); head.className = (level===0 ? 'mv-acc-head' : 'mv-sub-head');
+var t = document.createElement('span'); t.textContent = node.label;
+var ch = document.createElement('span'); ch.className='mv-acc-chevron'; ch.innerHTML = CHEVRON;
+head.appendChild(t); head.appendChild(ch);
+var body = document.createElement('div'); body.className = (level===0 ? 'mv-acc-body' : 'mv-sub-body');
+if(node.sub){
+node.sub.forEach(function(sn){ body.appendChild(buildNode(sn, level+1)); });
+} else {
+node.list.forEach(function(sw){ body.appendChild(buildSwatchRow(sw, node.onPick, node.withImg, node.dispFn)); });
+}
+head.addEventListener('click', function(e){
+e.stopPropagation();
+var wasOpen = item.classList.contains('open');
+item.parentElement.querySelectorAll(':scope > '+(level===0?'.mv-acc-item':'.mv-sub-item')).forEach(function(i){ i.classList.remove('open'); });
+if(!wasOpen) item.classList.add('open');
+});
+item.appendChild(head); item.appendChild(body);
+return item;
+}
+var SUM = { body:'', legs:'', top:'', trim:'' };
+var sumEls = {};
+function renderSummary(){
+if(sumEls.body) sumEls.body.textContent = SUM.body || '—';
+if(sumEls.legs) sumEls.legs.textContent = SUM.legs || '—';
+if(sumEls.top) sumEls.top.textContent = SUM.top || '—';
+if(sumEls.trim) sumEls.trim.textContent = SUM.trim || '—';
+}
+var palNodes = {}, sumRows = {}, sumLbls = {};
+function updatePanelForModel(){
+var mir = isMirror();
+var hasCer = named('cer').length > 0;                 // столешница — если есть
+var hasGold = trimMats().length > 0;                  // молдинг золото/серебро — AV-M и мебель
+var hasLegs = !mir && legMats().length > 0;           // ножки — только мебель
+var hasBody = bodyMats().length > 0;                  // крашеная эмаль-рама (BL/EL/AV; у AT-M чёрный металл исключён)
+var hasVeneer = (mirrorKey()==='EL-M');               // шпон — только зеркало EL-M
+if(palNodes['Цвет корпуса']) palNodes['Цвет корпуса'].style.display = hasBody ? '' : 'none';
+if(palNodes['Шпон']) palNodes['Шпон'].style.display = hasVeneer ? '' : 'none';
+if(palNodes['Столешница']) palNodes['Столешница'].style.display = hasCer ? '' : 'none';
+if(palNodes['Молдинг']) palNodes['Молдинг'].style.display = hasGold ? '' : 'none';
+if(palNodes['ЛегиТоггл']) palNodes['ЛегиТоггл'].style.display = hasLegs ? '' : 'none';
+if(sumRows.body) sumRows.body.style.display = hasBody ? '' : 'none';
+if(sumRows.top) sumRows.top.style.display = hasCer ? '' : 'none';
+if(sumRows.trim) sumRows.trim.style.display = hasGold ? '' : 'none';
+if(sumRows.legs) sumRows.legs.style.display = hasLegs ? '' : 'none';
+if(palNodes['Цвет корпуса']){ var _ch=palNodes['Цвет корпуса'].querySelector('.mv-acc-head span'); if(_ch) _ch.textContent = mir ? 'Цвет вставки' : 'Цвет корпуса'; }
+if(sumLbls.body) sumLbls.body.textContent = mir ? 'Вставка' : 'Корпус';
+}
+if(pal){
+var title = document.createElement('div'); title.className='mv-pal-title'; title.textContent='Выбрать материалы';
+pal.appendChild(title);
+var mMatte = function(n){ return n.replace('G/M','M'); };
+var mGloss = function(n){ return n.replace('G/M','G'); };
+var MENU = [
+{ label:'Цвет корпуса', sub:[
+{ label:'Матовый', list:BODY, withImg:true, dispFn:mMatte, onPick:function(sw){ applyBody(sampled[sw.name]||sw.hex, MATTE); SUM.body=mMatte(sw.name)+' · Матовый'; renderSummary(); } },
+{ label:'Глянцевый', list:BODY, withImg:true, dispFn:mGloss, onPick:function(sw){ applyBody(sampled[sw.name]||sw.hex, GLOSS); SUM.body=mGloss(sw.name)+' · Глянцевый'; renderSummary(); } }
+]},
+{ label:'Шпон', list:VENEER, withImg:true, dispFn:function(n){return n;}, onPick:function(sw){ applyVeneer(sw); SUM.body=sw.name; renderSummary(); } },
+{ label:'Столешница', sub:[
+{ label:'Кварц 20 мм', list:QUARTZ, withImg:false, onPick:function(sw){ applyTop(sw); SUM.top=sw.name+' · Кварц 20 мм'; renderSummary(); } }
+]},
+{ label:'Молдинг', list:TRIM, withImg:false, onPick:function(sw){ applyTrim(sw); SUM.trim=sw.name; renderSummary(); } }
+];
+MENU.forEach(function(node){ var _el=buildNode(node, 0); palNodes[node.label]=_el; pal.appendChild(_el); });
+// --- Ножки: галочка показа/скрытия ---
+var legToggle = document.createElement('div'); legToggle.className='mv-legs-row';
+var legLbl = document.createElement('label'); legLbl.className='mv-legs-label';
+var legChk = document.createElement('input'); legChk.type='checkbox'; legChk.checked=true; legChk.className='mv-legs-chk';
+var legTxt = document.createElement('span'); legTxt.textContent='Ножки';
+legLbl.appendChild(legChk); legLbl.appendChild(legTxt); legToggle.appendChild(legLbl);
+pal.appendChild(legToggle); palNodes['ЛегиТоггл']=legToggle;
+legChk.addEventListener('change', function(){
+setLegsOn(legChk.checked);
+SUM.legs = legChk.checked ? 'есть' : 'нет';
+renderSummary();
+});
+var COMPANY_EMAIL = 'info@cersa.ru';
+var FORM_ENDPOINT = 'https://formsubmit.co/ajax/' + COMPANY_EMAIL;
+var foot = document.createElement('div'); foot.className='mv-foot';
+var sum = document.createElement('div'); sum.className='mv-summary';
+var st = document.createElement('div'); st.className='mv-summary-title'; st.textContent='Ваш выбор'; sum.appendChild(st);
+[['Корпус','body'],['Ножки','legs'],['Столешница','top'],['Молдинг','trim']].forEach(function(p){
+var row=document.createElement('div'); row.className='mv-summary-row';
+var l=document.createElement('span'); l.className='mv-summary-lbl'; l.textContent=p[0];
+var v=document.createElement('span'); v.className='mv-summary-val'; v.textContent='—';
+row.appendChild(l); row.appendChild(v); sum.appendChild(row); sumEls[p[1]]=v; sumRows[p[1]]=row; sumLbls[p[1]]=l;
+});
+foot.appendChild(sum);
+var dims=document.createElement('div'); dims.className='mv-dims';
+var dl=document.createElement('div'); dl.className='mv-dims-lbl'; dl.textContent='Размеры, мм'; dims.appendChild(dl);
+var drow=document.createElement('div'); drow.className='mv-dims-row';
+function mkNum(ph){ var i=document.createElement('input'); i.type='number'; i.min='0'; i.inputMode='numeric'; i.placeholder=ph; i.className='mv-num'; return i; }
+var inW=mkNum('Ширина'), inD=mkNum('Глубина'), inH=mkNum('Высота');
+drow.appendChild(inW); drow.appendChild(inD); drow.appendChild(inH); dims.appendChild(drow);
+foot.appendChild(dims);
+var inC=document.createElement('input'); inC.type='email'; inC.className='mv-contact'; inC.placeholder='Ваш email'; inC.autocomplete='email';
+foot.appendChild(inC);
+var btns=document.createElement('div'); btns.className='mv-btns';
+var priceBtn=document.createElement('button'); priceBtn.type='button'; priceBtn.className='mv-price'; priceBtn.textContent='Узнать цену';
+btns.appendChild(priceBtn); foot.appendChild(btns);
+var btns2=document.createElement('div'); btns2.className='mv-btns2';
+var whereBtn=document.createElement('a'); whereBtn.className='mv-where'; whereBtn.href='https://cersa.ru/where_to_buy'; whereBtn.target='_blank'; whereBtn.rel='noopener'; whereBtn.textContent='Где купить';
+var resetBtn=document.createElement('button'); resetBtn.type='button'; resetBtn.className='mv-reset'; resetBtn.textContent='Сбросить';
+btns2.appendChild(whereBtn); btns2.appendChild(resetBtn); foot.appendChild(btns2);
+var statusEl=document.createElement('div'); statusEl.className='mv-status'; foot.appendChild(statusEl);
+function setStatus(m, ok){ statusEl.textContent=m||''; statusEl.style.color = ok ? '#2e7d32' : '#c0392b'; }
+var note=document.createElement('div'); note.className='mv-note';
+note.textContent='Изображение и цвета на экране носят ознакомительный характер и могут отличаться от реальных в зависимости от настроек вашего устройства; они не являются публичной офертой. Точные оттенки и фактуру материалов рекомендуем оценить лично — у наших официальных представителей в салонах, реализующих мебель CERSA.';
+foot.appendChild(note);
+pal.appendChild(foot);
+window.__mvForm = { inW:inW, inD:inD, inH:inH, inC:inC, status:statusEl, legChk:legChk };
+resetBtn.addEventListener('click', function(){
+if(window.__mvReset) window.__mvReset();
+if(viewer){ var s=viewer.getAttribute('src'); if(s){ viewer.removeAttribute('src'); setTimeout(function(){ viewer.setAttribute('src', s); }, 30); } }
+});
+priceBtn.addEventListener('click', function(){
+var contact=(inC.value||'').trim();
+if(!contact){ setStatus('Укажите email'); inC.focus(); return; }
+if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)){ setStatus('Введите корректный email'); inC.focus(); return; }
+var te=document.querySelector('.mv-modal__title');
+var product=(te?te.textContent:'').trim() || 'Тумба';
+var payload={
+_subject:'Запрос цены: '+product,
+_template:'table',
+_captcha:'false',
+_replyto:contact,
+'Модель':product,
+'Корпус':SUM.body||'—',
+'Ножки':SUM.legs||'—',
+'Столешница':SUM.top||'—',
+'Молдинг':SUM.trim||'—',
+'Размеры (Ш×Г×В)':(inW.value||'?')+'×'+(inD.value||'?')+'×'+(inH.value||'?')+' мм',
+'Email клиента':contact
+};
+setStatus('Отправляем…', true);
+if(FORM_ENDPOINT){
+fetch(FORM_ENDPOINT, {method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify(payload)})
+.then(function(r){ if(r.ok){ setStatus('Заявка отправлена!', true); inC.value=''; } else { setStatus('Не удалось отправить, попробуйте позже'); } })
+.catch(function(){ setStatus('Ошибка сети, попробуйте позже'); });
+} else {
+var subj='Запрос цены: '+product;
+var bt='Модель: '+product+'\nКорпус: '+payload['Корпус']+'\nНожки: '+payload['Ножки']+'\nСтолешница: '+payload['Столешница']+'\nМолдинг: '+payload['Молдинг']+'\nРазмеры (Ш×Г×В): '+payload['Размеры (Ш×Г×В)']+'\nEmail клиента: '+contact;
+window.location.href='mailto:'+COMPANY_EMAIL+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(bt);
+setStatus('Открываем почтовое приложение…', true);
+}
+});
+}
+var DEF = {};
+function defKey(m){ return (viewer.getAttribute('src')||'').split('?')[0]+'|'+(m.name||''); }
+function captureDefaults(){
+mats().forEach(function(m){
+var key=defKey(m); if(key in DEF) return;
+var p=m.pbrMetallicRoughness; if(!p) return;
+DEF[key]={ color:(p.baseColorFactor?p.baseColorFactor.slice():null),
+metal:(p.metallicFactor!=null?p.metallicFactor:null),
+rough:(p.roughnessFactor!=null?p.roughnessFactor:null),
+tex:(p.baseColorTexture?p.baseColorTexture.texture:undefined) };
+});
+}
+function restoreDefaults(){
+mats().forEach(function(m){
+var d=DEF[defKey(m)]; if(!d) return;
+var p=m.pbrMetallicRoughness; if(!p) return;
+try{ if(d.color) p.setBaseColorFactor(d.color); }catch(e){}
+try{ if(d.metal!=null) p.setMetallicFactor(d.metal); }catch(e){}
+try{ if(d.rough!=null) p.setRoughnessFactor(d.rough); }catch(e){}
+try{ if(p.baseColorTexture && d.tex!==undefined) p.baseColorTexture.setTexture(d.tex); }catch(e){}
+});
+}
+if(viewer){
+viewer.addEventListener('load', function(){
+captureDefaults();
+restoreDefaults();
+updatePanelForModel();
+if(isMirror()){                          // ЗЕРКАЛО: вид запечён (дефолт коллекции); показываем меню настройки
+var mk = mirrorKey(); var d = MIRROR_DEF[mk] || {};
+if(d.body){ cur.body = {hex:d.body, rough:GLOSS}; SUM.body = d.bodyName; }
+else { cur.body = null; SUM.body = d.bodyName || ''; }
+if(d.trim){ cur.trim = TRIM.filter(function(t){return t.name===d.trim;})[0] || TRIM[0]; SUM.trim = d.trim; }
+else { cur.trim = null; SUM.trim = ''; }
+SUM.top=''; SUM.legs=''; cur.top=null;
+renderSummary();
+try{ viewer.cameraOrbit='-14deg 80deg auto'; viewer.fieldOfView='auto'; if(viewer.jumpCameraToGoal) viewer.jumpCameraToGoal(); }catch(e){}
+return;
+}
+// молдинг + наконечники ножек — глянцевый металл по умолчанию
+trimMats().forEach(function(m){ var p=m.pbrMetallicRoughness; if(p){ try{p.setMetallicFactor(1);}catch(e){} try{p.setRoughnessFactor(GOLD_ROUGH);}catch(e){} } });
+// корпус по умолчанию — эмаль G/M (24) Sea Shell, глянец
+if(!cur.body){ cur.body = {hex:'#e7ddd0', rough:GLOSS}; SUM.body='G (24) Sea Shell · Глянцевый'; renderSummary(); }
+if(!cur.trim){ cur.trim = TRIM[0]; SUM.trim=TRIM[0].name; renderSummary(); } // молдинг по умолчанию — Золото
+if(cur.body) applyBody(cur.body.hex, cur.body.rough);
+if(cur.top) applyTop(cur.top);
+if(cur.trim) applyTrim(cur.trim);
+// ножки по умолчанию — есть
+LEGS_ON = true; if(!SUM.legs && legMats().length){ SUM.legs='есть'; renderSummary(); }
+applyLegVisibility();
+try{ viewer.cameraOrbit='-22deg 74deg auto'; viewer.fieldOfView='auto'; if(viewer.jumpCameraToGoal) viewer.jumpCameraToGoal(); }catch(e){}
+});
+}
+window.__mvReset = function(){
+cur.body = null; cur.top = null; cur.trim = null;
+LEGS_ON = true; // ножки по умолчанию снова есть
+SUM.body=''; SUM.legs=''; SUM.top=''; SUM.trim=''; renderSummary();
+if(pal){
+var _chk = pal.querySelector('.mv-legs-chk'); if(_chk) _chk.checked = true;
+pal.querySelectorAll('.mv-swatch-row.active').forEach(function(s){ s.classList.remove('active'); });
+pal.querySelectorAll('.mv-acc-item.open, .mv-sub-item.open').forEach(function(i){ i.classList.remove('open'); });
+}
+var f = window.__mvForm;
+if(f){ if(f.inW) f.inW.value=''; if(f.inD) f.inD.value=''; if(f.inH) f.inH.value=''; if(f.inC) f.inC.value=''; if(f.status) f.status.textContent=''; if(f.legChk) f.legChk.checked=true; }
+};
+})();
+(function() {
+document.querySelectorAll('.mr3dBlk').forEach(function(block) {
+const toggleBtn = block.querySelector('.mr3dToggle');
+const collapsible = block.querySelector('.collapsible-content');
+const sidebarEl = block.querySelector('.sidebar');
+const categoryBtns = block.querySelectorAll('.mr3dCatBtn');
+const categoryBlocks = block.querySelectorAll('.mr3dCatBlk');
+const isMobile = window.innerWidth <= 768;
+let isVisible = false, tapTimeout = null;
+function resetZoom(){ if(isMobile) return; block.querySelectorAll('.item.zoomed-item').forEach(function(i){ i.classList.remove('zoomed-item'); }); }
+function showFirstCat(){
+if(categoryBlocks.length>0 && categoryBtns.length>0){
+categoryBlocks.forEach(function(c){ c.style.display='none'; });
+categoryBtns.forEach(function(b){ b.classList.remove('active'); });
+categoryBlocks[0].style.display='block'; categoryBtns[0].classList.add('active');
+}
+}
+function expand(){ collapsible.classList.add('expanded'); if(toggleBtn) toggleBtn.classList.add('active'); isVisible=true; }
+function peek(){ collapsible.classList.remove('expanded'); if(toggleBtn) toggleBtn.classList.remove('active'); isVisible=false; resetZoom(); showFirstCat(); }
+function toggleContent(){ if(isVisible) peek(); else expand(); }
+function hideAllCategories(){ categoryBlocks.forEach(function(c){ c.style.display='none'; }); }
+categoryBtns.forEach(function(btn, index){
+btn.addEventListener('click', function(e){
+e.preventDefault();
+if(!isVisible){
+toggleContent();
+setTimeout(function(){
+hideAllCategories();
+categoryBtns.forEach(function(b){ b.classList.remove('active'); });
+categoryBlocks[index].style.display='block'; btn.classList.add('active');
+if(sidebarEl){ setTimeout(function(){ var o=sidebarEl.getBoundingClientRect().top+window.pageYOffset-130; window.scrollTo({top:o,behavior:'smooth'}); },50); }
+},60);
+return;
+}
+resetZoom();
+if(btn.classList.contains('active')){ categoryBlocks[index].style.display='none'; btn.classList.remove('active'); }
+else{
+hideAllCategories(); categoryBlocks[index].style.display='block';
+categoryBtns.forEach(function(b){ b.classList.remove('active'); }); btn.classList.add('active');
+if(sidebarEl){ var o=sidebarEl.getBoundingClientRect().top+window.pageYOffset-130; window.scrollTo({top:o,behavior:'smooth'}); }
+}
+});
+});
+if(toggleBtn){ toggleBtn.addEventListener('click', function(e){ e.preventDefault(); toggleContent(); }); }
+var showAllBtn = block.querySelector('.mr3dShowAll');
+if(showAllBtn){ showAllBtn.addEventListener('click', function(e){ e.stopPropagation(); expand(); }); }
+var hideAllBtn = block.querySelector('.mr3dHideAll');
+if(hideAllBtn){ hideAllBtn.addEventListener('click', function(e){ e.stopPropagation(); peek(); var top=block.getBoundingClientRect().top+window.pageYOffset-80; window.scrollTo({top:top,behavior:'smooth'}); }); }
+collapsible.addEventListener('click', function(){ if(!isVisible) expand(); });
+collapsible.classList.remove('expanded'); if(toggleBtn) toggleBtn.classList.remove('active'); showFirstCat(); isVisible=false;
+block.querySelectorAll('.item').forEach(function(item){
+item.addEventListener('click', function(e){
+e.stopPropagation();
+var url = this.getAttribute('data-model');
+if(url && url.indexOf('ВСТАВЬ') === -1){
+var span = this.querySelector('span:not(.badge-3d)');
+openModelViewer(url, span ? span.textContent : '');
+return;
+}
+if(!isMobile){
+if(this.classList.contains('zoomed-item')) this.classList.remove('zoomed-item');
+else { resetZoom(); this.classList.add('zoomed-item'); }
+}
+});
+});
+if(!isMobile){
+document.body.addEventListener('click', function(e){ if(!e.target.closest('.item') && block.contains(e.target)) resetZoom(); });
+} else {
+block.querySelectorAll('.item').forEach(function(item){
+item.addEventListener('touchstart', function(){ if(!isVisible) return; tapTimeout=setTimeout(function(){ item.classList.add('tapped'); },50); });
+item.addEventListener('touchend', function(){ clearTimeout(tapTimeout); item.classList.remove('tapped'); });
+item.addEventListener('touchcancel', function(){ clearTimeout(tapTimeout); item.classList.remove('tapped'); });
+});
+}
+});
+})();
+</script>
+<script>
+// Превью-карточки: показываем коллекцию в дефолтном виде — корпус эмаль (Sea Shell, глянец),
+// стойки ножек повторяют корпус, молдинг/ручки/наконечники ножек — золото. Модели НЕ трогаем.
+(function(){
+var BODY_HEX = '#e7ddd0';      // G/M (24) Sea Shell
+var BODY_ROUGH = 0.12;         // глянец
+var GOLD_HEX = '#c9a44c';      // золото по умолчанию
+var GAP_RE   = /gap|зазор|\.0\d+$/i;                       // зазор/торец
+var MIRROR_RE= /mirror|зеркал|a{5,}/i;                     // зеркало (на будущее)
+var TRIM_RE  = /^(gold|leggold)$/i;                        // молдинг/ручки/наконечники ножек
+var SKIP_RE  = /cer|marble|мрамор|glass|стекл|black metal/i; // столешница/стекло/чёрный металл — как в GLB
+function styleThumb(mv){
+var model = mv.model; if(!model) return;
+var isMir = (model.materials||[]).some(function(m){ return MIRROR_RE.test(m.name||''); });
+(model.materials || []).forEach(function(m){
+var nm = m.name || '';
+var p = m.pbrMetallicRoughness; if(!p) return;
+if(MIRROR_RE.test(nm)){                       // зеркальное стекло (единый вид во всех коллекциях)
+try{ if(p.baseColorTexture) p.baseColorTexture.setTexture(null); }catch(e){} try{ if(m.normalTexture) m.normalTexture.setTexture(null); }catch(e){} try{ if(p.metallicRoughnessTexture) p.metallicRoughnessTexture.setTexture(null); }catch(e){} try{ p.setBaseColorFactor('#eef1f4'); }catch(e){} try{ p.setMetallicFactor(1); }catch(e){} try{ p.setRoughnessFactor(0.02); }catch(e){}
+return;
+}
+if(isMir) return;                             // у зеркал рамка/молдинг — как запечено (единый кремовый)
+if(TRIM_RE.test(nm)){                          // молдинг + ручки + наконечники ножек — золото
+try{ if(p.baseColorTexture) p.baseColorTexture.setTexture(null); }catch(e){} try{ p.setBaseColorFactor(GOLD_HEX); }catch(e){} try{ p.setMetallicFactor(1); }catch(e){} try{ p.setRoughnessFactor(0.06); }catch(e){}
+return;
+}
+if(SKIP_RE.test(nm)) return;                  // столешница — как в GLB
+if(GAP_RE.test(nm)){                           // зазор — цвет корпуса, слегка затемнён (мягкая тень)
+try{ if(p.baseColorTexture) p.baseColorTexture.setTexture(null); }catch(e){}
+try{ p.setBaseColorFactor('#868079'); }catch(e){}
+try{ p.setMetallicFactor(0); }catch(e){}
+try{ p.setRoughnessFactor(0.55); }catch(e){}
+return;
+}
+// корпус и стойки ножек (Leg) — эмаль Sea Shell
+try{ if(p.baseColorTexture) p.baseColorTexture.setTexture(null); }catch(e){}
+try{ p.setBaseColorFactor(BODY_HEX); }catch(e){}
+try{ p.setMetallicFactor(0); }catch(e){}
+try{ p.setRoughnessFactor(BODY_ROUGH); }catch(e){}
+});
+}
+function hook(mv){
+if(mv.__styled) return; mv.__styled = true;
+if(mv.model) styleThumb(mv);
+mv.addEventListener('load', function(){ styleThumb(mv); });
+}
+function run(){ document.querySelectorAll('model-viewer.mr3d-thumb').forEach(hook); }
+if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', run); }
+else { run(); }
+})();
+</script>
+</body>
+</html>
